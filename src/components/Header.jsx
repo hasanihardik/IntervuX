@@ -8,12 +8,12 @@ function Header() {
 
   return (
     <header className="bg-white shadow-sm">
-      <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav className="flex justify-between items-center h-16">
           <Link to="/" className="text-2xl font-bold text-indigo-600">
             IntervuX
           </Link>
-          <div className="hidden md:flex space-x-4">
+          <div className="hidden md:flex items-center space-x-4">
             <NavLink to="/pricing">Pricing</NavLink>
             <NavLink to="/login">Login</NavLink>
             <NavLink to="/signup" className="bg-indigo-600 text-white">
@@ -21,19 +21,15 @@ function Header() {
             </NavLink>
           </div>
           <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-        </div>
-        {isMenuOpen && (
-          <div className="mt-4 md:hidden">
+        </nav>
+      </div>
+      {isMenuOpen && (
+        <div className="md:hidden border-t border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-2">
             <NavLink to="/pricing" mobile>
               Pricing
             </NavLink>
@@ -44,8 +40,8 @@ function Header() {
               Sign Up
             </NavLink>
           </div>
-        )}
-      </nav>
+        </div>
+      )}
     </header>
   )
 }
