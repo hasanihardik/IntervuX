@@ -1,74 +1,54 @@
-import { useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Formik, Form, Field, ErrorMessage } from "formik"
+import * as Yup from "yup"
+import { Link, useNavigate } from "react-router-dom"
 
 const SignupSchema = Yup.object().shape({
-  username: Yup.string().required("Required"),
+  name: Yup.string().required("Required"),
   email: Yup.string().email("Invalid email").required("Required"),
   password: Yup.string().min(8, "Password must be at least 8 characters").required("Required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Required"),
-});
+})
 
 function Signup() {
-  const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [action, setAction] = useState("Sign Up");
+  const navigate = useNavigate()
 
-  const handleSubmit = async (values, { setSubmitting }) => {
-    if (action === "Sign Up") {
-      try {
-        const response = await axios.post("http://localhost:8080/api/signup", {
-          username: values.username,
-          email: values.email,
-          password: values.password,
-        });
+  const handleSubmit = (values, { setSubmitting }) => {
+    // TODO: Implement signup logic
+    console.log(values)
+    setSubmitting(false)
 
-        if (response.status === 201) {
-          alert("Signup successful! Please login.");
-          setAction("Login");
-          setUsername("");
-          setEmail("");
-          setPassword("");
-          setConfirmPassword("");
-          navigate("/login");
-        } else {
-          alert("Signup failed. Try again.");
-        }
-      } catch (error) {
-        console.error("Error signing up:", error);
-        alert("An error occurred. Please try again.");
-      }
-    }
-    setSubmitting(false);
-  };
+    // Authentication logic (to be implemented)
+    // 1. Send a POST request to your backend API with the user's information
+    // 2. If the signup is successful, receive a token from the server
+    // 3. Store the token securely (e.g., in localStorage or httpOnly cookie)
+    // 4. Redirect the user to the profile setup page
+    // 5. Update the app's state to reflect that the user is logged in
+
+    navigate("/profile-setup")
+  }
 
   return (
     <div className="max-w-md mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-center">Sign Up for IntervuX</h1>
       <Formik
-        initialValues={{ username: "", email: "", password: "", confirmPassword: "" }}
+        initialValues={{ name: "", email: "", password: "", confirmPassword: "" }}
         validationSchema={SignupSchema}
         onSubmit={handleSubmit}
       >
         {({ isSubmitting }) => (
           <Form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <div className="mb-4">
-              <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
-                Username
+              <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
+                Name
               </label>
               <Field
                 type="text"
-                name="username"
+                name="name"
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               />
-              <ErrorMessage name="username" component="div" className="text-red-500 text-xs italic" />
+              <ErrorMessage name="name" component="div" className="text-red-500 text-xs italic" />
             </div>
             <div className="mb-4">
               <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
@@ -122,7 +102,8 @@ function Signup() {
         </Link>
       </p>
     </div>
-  );
+  )
 }
 
-export default Signup;
+export default Signup
+

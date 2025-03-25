@@ -1,20 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useAuth } from './AuthContext'
+import { Link } from "react-router-dom"
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { isAuthenticated, setIsAuthenticated } = useAuth()
-  const navigate = useNavigate()
-
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem("authToken") // Remove token
-    setIsAuthenticated(false) // Update global state
-    navigate("/login") // Redirect to login page
-  }
 
   return (
     <header className="bg-white shadow-sm">
@@ -25,21 +15,10 @@ function Header() {
           </Link>
           <div className="hidden md:flex items-center space-x-4">
             <NavLink to="/pricing">Pricing</NavLink>
-            {!isAuthenticated ? (
-              <>
-                <NavLink to="/login">Login</NavLink>
-                <NavLink to="/signup" className="bg-indigo-600 text-white">
-                  Sign Up
-                </NavLink>
-              </>
-            ) : (
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 rounded-md font-medium transition-colors duration-200 bg-red-600 text-white hover:bg-red-700"
-              >
-                Logout
-              </button>
-            )}
+            <NavLink to="/login">Login</NavLink>
+            <NavLink to="/signup" className="bg-indigo-600 text-white">
+              Sign Up
+            </NavLink>
           </div>
           <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -54,23 +33,12 @@ function Header() {
             <NavLink to="/pricing" mobile>
               Pricing
             </NavLink>
-            {!isAuthenticated ? (
-              <>
-                <NavLink to="/login" mobile>
-                  Login
-                </NavLink>
-                <NavLink to="/signup" mobile className="bg-indigo-600 text-white">
-                  Sign Up
-                </NavLink>
-              </>
-            ) : (
-              <button
-                onClick={handleLogout}
-                className="w-full text-left px-4 py-2 rounded-md font-medium bg-red-600 text-white hover:bg-red-700 mb-2"
-              >
-                Logout
-              </button>
-            )}
+            <NavLink to="/login" mobile>
+              Login
+            </NavLink>
+            <NavLink to="/signup" mobile className="bg-indigo-600 text-white">
+              Sign Up
+            </NavLink>
           </div>
         </div>
       )}
@@ -91,3 +59,4 @@ function NavLink({ to, children, mobile, className }) {
 }
 
 export default Header
+
