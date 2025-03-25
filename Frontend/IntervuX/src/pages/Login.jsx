@@ -1,42 +1,72 @@
+import { useState } from "react"
 import { Formik, Form, Field, ErrorMessage } from "formik"
 import * as Yup from "yup"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import axios from "axios"
+import { useAuth } from '../components/AuthContext' // Import the useAuth hook
 
 const LoginSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Required"),
-  password: Yup.string().required("Required"),
+  identifier: Yup.string().required("Email/Username is required"),
+  password: Yup.string().required("Password is required"),
 })
 
 function Login() {
-  const handleSubmit = (values, { setSubmitting }) => {
-    // TODO: Implement login logic
-    console.log(values)
-    setSubmitting(false)
+  const [error, setError] = useState(null)
+  const navigate = useNavigate()
+  const { setIsAuthenticated } = useAuth() // Use the setIsAuthenticated function from AuthContext
 
-    // Authentication logic (to be implemented)
-    // 1. Send a POST request to your backend API with the user's credentials
-    // 2. If the credentials are valid, receive a token from the server
-    // 3. Store the token securely (e.g., in localStorage or httpOnly cookie)
-    // 4. Redirect the user to the dashboard or home page
-    // 5. Update the app's state to reflect that the user is logged in
+  const handleSubmit = async (values, { setSubmitting }) => {
+    setError(null)
+    try {
+      const response = await axios.post("http://localhost:8080/api/login", values)
+      const { token, message, profileCompleted } = response.data
+
+      // Store token in localStorage
+      localStorage.setItem("authToken", token)
+
+      // Update the authentication state
+      setIsAuthenticated(true)
+
+      console.log("Login successful:", message)
+
+      // Redirect user based on profile completion
+      if (profileCompleted) {
+        navigate("/dashboard")
+      } else {
+        navigate("/profile-setup")
+      }
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          setError("Invalid Credentials") // Token expired case
+        } else {
+          setError(error.response.data.message || "Login failed. Please try again.")
+        }
+      } else {
+        setError("Network error. Please try again.")
+      }
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
     <div className="max-w-md mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-center">Log in to IntervuX</h1>
-      <Formik initialValues={{ email: "", password: "" }} validationSchema={LoginSchema} onSubmit={handleSubmit}>
+      {error && <p className="text-red-500 text-center">{error}</p>}
+      <Formik initialValues={{ identifier: "", password: "" }} validationSchema={LoginSchema} onSubmit={handleSubmit}>
         {({ isSubmitting }) => (
           <Form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <div className="mb-4">
-              <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
-                Email
+              <label htmlFor="identifier" className="block text-gray-700 text-sm font-bold mb-2">
+                Email/Username
               </label>
               <Field
-                type="email"
-                name="email"
+                type="text"
+                name="identifier"
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               />
-              <ErrorMessage name="email" component="div" className="text-red-500 text-xs italic" />
+              <ErrorMessage name="identifier" component="div" className="text-red-500 text-xs italic" />
             </div>
             <div className="mb-6">
               <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
@@ -55,7 +85,7 @@ function Login() {
                 disabled={isSubmitting}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
               >
-                Log In
+                {isSubmitting ? "Logging in..." : "Log In"}
               </button>
               <Link
                 to="/forgot-password"
@@ -78,4 +108,3 @@ function Login() {
 }
 
 export default Login
-
