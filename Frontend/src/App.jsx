@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom"
+import { AuthProvider, useAuth } from "./components/AuthContext"
 import Header from "./components/Header"
 import Footer from "./components/Footer"
 import Home from "./pages/Home"
@@ -12,24 +13,59 @@ import Pricing from "./pages/Pricing"
 function App() {
   return (
     <Router>
+      <AuthProvider>
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow w-full">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={
+              <HomeRoute>
+                <Home />
+              </HomeRoute>
+            } />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile-setup" element={<ProfileSetup />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/interview" element={<InterviewInterface />} />
+            <Route path="/dashboard" element={
+              // <RequireAuth>
+                <Dashboard />
+              // </RequireAuth>
+            } />
+            <Route path="/interview" element={
+              // <RequireAuth>
+                <InterviewInterface />
+              // </RequireAuth>
+            } />
             <Route path="/pricing" element={<Pricing />} />
           </Routes>
         </main>
         <Footer />
       </div>
+      </AuthProvider>
     </Router>
   )
 }
 
-export default App
+// Component to handle home route logic
+function HomeRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" />;
+  }
+  
+  return children;
+}
 
+// Component to protect authenticated routes
+function RequireAuth({ children }) {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  return children;
+}
+
+export default App
